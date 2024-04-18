@@ -1,0 +1,30 @@
+name,area,energy,status
+Washing Machine,Laundry,1.4,0
+Microwave,Kitchen,1,0
+Iron,Laundry,1.1,0
+Blender,Kitchen,1,0
+Oven,Kitchen,3,0
+Living Room Fan,General,0.33,0
+Drawing Room Fan,General,0.33,0
+Bedroom 1 Fan,General,0.33,0
+Bedroom 2 Fan,General,0.33,0
+Living Room AC,General,2,0
+Drawing Room AC,General,3,0
+Bedroom 1 AC,General,3,0
+Bedroom 2 AC,General,3,0
+Vacuum Cleaner,General,0.6,0
+Electric Stove,Kitchen,1.75,0
+Coffee Maker,Kitchen,1.5,0
+Toaster,Kitchen,0.9,0
+Bedroom 1 Heater,General,1.8,0
+Bedroom 2 Heater,General,1.8,0
+Living Room Heater,General,1.8,0
+Refrigerator,Kitchen,1.2,1
+Dish Washer,Kitchen,1.2,1
+Living Room TV,General,0.2,1
+Drawing Room TV,General,0.2,0
+Bedroom 1 TV,General,0.2,0
+Bedroom 2 TV,General,0.2,0
+Kettle,Kitchen,1.2,0
+Dryer,Laundry,1.8,1
+Air Fryer,Kitchen,0.75,0
