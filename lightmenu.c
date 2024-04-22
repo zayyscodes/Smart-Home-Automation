@@ -50,10 +50,10 @@ void* readflags(void* arg){
 }
 
 void displaylightmenu(){
-start:
+menu:
 	int choice;
 	printf("\n\nMenu:\n1, Switch Off/On Light\n2, Check Lights\nEnter Choice:");
-	scanf("%d", choice);
+	scanf("%d", &choice);
 	
 	switch(choice){
 		case 1:{
@@ -81,14 +81,14 @@ start:
 			
 			printf("Entries with flag = 1:\n");
 		        for (int i = 0; entries[i].area[0] != '\0'; i++) {
-		        printf("Area: %s, Num: %d, Watt: %.2f\n", entries[i].area, entries[i].num, entries[i].watt);
+		        	printf("Area: %s, Num: %d, Watt: %.2f\n", entries[i].area, entries[i].num, entries[i].watt);
 		        }
 		break;
 		}
 		
 		default:{
 			printf("\nInvalid Choice.");
-			goto start;
+			goto menu;
 		break;
 		}
 	}	
