@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "lightmenu.h"
 #include "e_manage.h"
+#include "appmenu.h"
 #include <unistd.h>
 
 float econsume, cons;
@@ -54,7 +55,8 @@ int main(){
 		}
 		
 		case 3:{
-			printf("\nAppliances chose.");
+			//printf("\nAppliances chose.");
+			displayappmenu();
 		break;
 		}
 		

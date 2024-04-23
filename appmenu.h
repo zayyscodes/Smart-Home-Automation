@@ -6,7 +6,6 @@
 #ifndef APPMENU_H
 #define APPMENU_H
 
-void* readflags(void* arg);
 void displayappmenu(void);
 
 #endif

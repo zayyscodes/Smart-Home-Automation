@@ -1,2 +1,2 @@
 make: 
-	gcc -o test lightmenu.c e_manage.c mainn.c
+	gcc -o test appmenu.c lightmenu.c e_manage.c mainn.c

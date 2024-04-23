@@ -1,76 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <string.h>
 
-#define MAX 100
+#define MAX_LINE_LENGTH 1024
 
-float getenergyforday(int serial_number);
+int main() {
+    const char *filename = "energy_in (another copy).csv"; // Replace with your CSV file's name
+    int sno_to_update = 10; // Replace with the sno you want to update
+    float new_energy_in = 99.9; // Replace with the new energy_in value
 
-typedef struct {
-    int serial_number;
-    float energy;
-} EnergyData;
-
-// Function to get energy data for a specific serial number
-void* get_energy_data(void* arg) {
-    int serial_number = *(int*)arg;
-    EnergyData *data = malloc(sizeof(EnergyData));
-    data->serial_number = serial_number;
-    data->energy = getenergyforday(serial_number);
-    return data;
-}
-
-// Modify getenergyforday to accept a serial number as parameter
-float getenergyforday(int serial_number) {
-    const char *filename = "energy_in.csv";
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(filename, "r+");
     if (!file) {
         perror("Failed to open the file");
-        return 0;
+        return 1;
     }
 
-    char line[MAX];
-    int sno;
-    float energy_in;
-    int found = 0;
+    // Read the header line and store it for later writing
+    char header[MAX_LINE_LENGTH];
+    if (!fgets(header, sizeof(header), file)) {
+        perror("Failed to read header");
+        fclose(file);
+        return 1;
+    }
 
+    char line[MAX_LINE_LENGTH];
+    long int header_end_position = ftell(file);
+
+    // Find the position of the line with the sno to be updated
     while (fgets(line, sizeof(line), file)) {
-        sscanf(line, "%d,%f", &sno, &energy_in);
-        if (sno == serial_number) {
-            found = 1;
+        int sno;
+        float energy_in;
+        long int line_position = ftell(file) - strlen(line);
+
+        if (sscanf(line, "%d,%f", &sno, &energy_in) != 2) {
+            fprintf(stderr, "Invalid line format: %s", line);
+            continue;
+        }
+
+        if (sno == sno_to_update) {
+            // Modify the line with the updated energy_in value
+            fseek(file, line_position, SEEK_SET);
+
+            // Remove the newline character from the line
+            char *newline_pos = strchr(line, '\n');
+            if (newline_pos)
+                *newline_pos = '\0';
+
+            fprintf(file, "%d,%.1f", sno_to_update, new_energy_in); // Write without newline
             break;
         }
     }
 
     fclose(file);
-    if (found) {
-        return energy_in;
-    } else {
-        printf("Serial number %d not found in the file.\n", serial_number);
-        return 0;
-    }
-}
 
-int main() {
-    pthread_t thread;
-    srand(time(NULL));
-    int sno = rand() % 200 + 1;
-
-
-    // Create threads
-   if (pthread_create(&thread, NULL, get_energy_data, &sno)) {
-               fprintf(stderr, "Error creating thread\n");
-         return 1;
-   }
-
-    // Join threads and print results
-        EnergyData* data;
-        if (pthread_join(thread, (void**)&data)) {
-            fprintf(stderr, "Error joining thread\n");
-            return 1;
-        }
-        printf("Serial number %d: Energy = %.2f\n", data->serial_number, data->energy);
-        free(data);
+    printf("CSV file updated successfully.\n");
 
     return 0;
 }

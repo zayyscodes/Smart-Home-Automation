@@ -14,7 +14,7 @@ typedef struct{
 	float watt;
 }LightData;
 
-void* readflags(void* arg){
+void* readflag(void* arg){
 	FILE *file = fopen("lights_data.csv", "r");
 	if (!file){
 		perror("Failed to open file");
@@ -52,7 +52,7 @@ void* readflags(void* arg){
 void displaylightmenu(){
 menu:
 	int choice;
-	printf("\n\nMenu:\n1, Switch Off/On Light\n2, Check Lights\nEnter Choice:");
+	printf("\n\nMenu:\n1, Switch Off/On Light\n2, Check Lights\nEnter Choice: ");
 	scanf("%d", &choice);
 	
 	switch(choice){
@@ -63,7 +63,7 @@ menu:
 		
 		case 2:{
 			pthread_t thread;
-			if (pthread_create(&thread, NULL, readflags, NULL)){
+			if (pthread_create(&thread, NULL, readflag, NULL)){
 				perror("Failed to create thread.");
 				break;
 			}
@@ -81,7 +81,7 @@ menu:
 			
 			printf("Entries with flag = 1:\n");
 		        for (int i = 0; entries[i].area[0] != '\0'; i++) {
-		        	printf("Area: %s, Num: %d, Watt: %.2f\n", entries[i].area, entries[i].num, entries[i].watt);
+		        	printf("Area: %s, Num: %d, Watt: %.2fkWh\n", entries[i].area, entries[i].num, entries[i].watt);
 		        }
 		break;
 		}
