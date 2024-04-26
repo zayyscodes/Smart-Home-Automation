@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include "appmenu.h"
 
 #define MAX 100
 #define LEN 1024
@@ -372,7 +373,7 @@ void* readflags(void* arg){
 void displayappmenu(void){
 menuu:
 	int choice;
-	printf("\n\nMenu:\n1, Switch Off/On appliance\n2, Check appliances\nEnter Choice: ");
+	printf("\n\nMenu:\n1, Switch Off/On appliance\n2, Check appliances\n3, Go to Main menu\nEnter Choice: ");
 	scanf("%d", &choice);
     
 	switch(choice){
@@ -406,6 +407,10 @@ menuu:
   	 		 }
   	  break;
   	  }
+  	  
+  	  case 3: {
+		return;
+	  }
   	 
   	  default:{
   		  printf("\nInvalid Choice.");

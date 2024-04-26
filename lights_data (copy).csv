@@ -5,7 +5,8 @@ Drawing Room,8,0.1,0
 Bedroom 1,8,0.05,1
 Bedroom 2,6,0.05,0
 Living Room,4,0.1,1
-Front Porch,2,0.08,0
+Front Porch,2,0.08,1
+
 Backyard,1,0.2,0
 Garage,4,0.05,0
 
