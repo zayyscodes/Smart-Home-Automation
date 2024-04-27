@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "shm.h"
 
 #define MAX_USERS 100
 #define idlen 50

@@ -6,8 +6,11 @@
 #include "tempmenu.h"
 #include "shm.h"
 #include <time.h>
+#include <unistd.h>
 
-SmrtHome* shm = getshm(); //pointer to shared memory
+#define MAX 1024
+
+extern SmartHome* shm; //pointer to shared memory
 
 // F U N C   T O   R E A D   C S V   F I L E    T H R O U G H    T H R E A D
 void* get_temp_data(void* arg) {

@@ -9,14 +9,12 @@
 #include "appmenu.h"
 #include "tempmenu.h"
 #include "shm.h"
-#include "passwordcheck.c"
-
+#include "passwordcheck.h"
 
 //KIYA KIYA REHTA HAI: SHARED MEMORY LAGANA & TASK SCHEDULING
 
+SmartHome* shm; //pointer to shared memory
 
-
-float econsume, cons;
 int usernum = 0;
 struct User users[MAX_USERS];
 
@@ -72,36 +70,46 @@ int login(){
 }
 
 int main(){
-	int log = login();
+	
+/*	int log = login();
 	
 	if (log == 0){
 		printf("Unable to access portal account.\n");
 		stop();
 		exit(EXIT_FAILURE);
-	} else ;
-
-start:	
-	stop();
-	system("clear");
-	
-	econsume = getenergy();
-	cons = consumingInitial();
-	
+	} else
+		printf("\n\n\nP R O C E E D\n\n");
+		; //initialise(shm);
+*/
+start:
 	header();
+	printf(" E F  Y O U  O S :");
+	shm = getshm();
+	if (shm == NULL) {
+		printf("Failed to initialize shared memory.\n");
+		exit(EXIT_FAILURE);
+	}
+	initialise(shm);
+	setshm(shm);
 	
-	if (econsume >= 10.0)
-	printf("\nSunny | High Energy Input today - %.1fkWh", econsume);
-	else if (econsume < 10.0 && econsume >= 5.0)
-	printf("\nCloudy | Average Energy Input today - %.1fkWh", econsume);
-	else if (econsume < 5.0 && econsume > 0.0)
-	printf("\nGloomy | Low Energy Input today - %.1fkWh", econsume);
+	
+	
+	setinput();
+	
+	
+	if (shm->enerin >= 10.0)
+	printf("\nSunny | High Energy Input today - %.1fkWh", shm->enerin);
+	else if (shm->enerin < 10.0 && shm->enerin >= 5.0)
+	printf("\nCloudy | Average Energy Input today - %.1fkWh", shm->enerin);
+	else if (shm->enerin < 5.0 && shm->enerin > 0.0)
+	printf("\nGloomy | Low Energy Input today - %.1fkWh", shm->enerin);
 	else {
 		printf("\nERROR | No Input");
 		sleep(1);
 		exit(EXIT_FAILURE);
 	}
-	printf("\nIn consumption: %.1fkWh", cons);
-	if (cons > econsume)
+	printf("\nIn consumption: %.1fkWh", shm->inuse);
+	if (shm->inuse > shm->enerin)
 	printf("\nBackup Batteries are in use.");
 	
 	int ch;

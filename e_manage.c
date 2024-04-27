@@ -3,8 +3,11 @@
 #include <pthread.h>
 #include "e_manage.h"
 #include <time.h>
+#include "shm.h"
 
 #define MAX 100
+
+extern SmartHome* shm; //pointer to shared memory
 
 // Thread function
 void* get_energy_data(void* arg) {
@@ -151,5 +154,19 @@ float consumingInitial(void) {
     free(energy);
 
     return result;
+}
+
+void setinput(){
+	shm = getshm(); //pointer to shared memory
+	
+	pthread_mutex_lock(&(shm->mutex_enerin));
+        pthread_mutex_lock(&(shm->mutex_inuse));
+        
+	shm->enerin = getenergy();
+	shm->inuse = (consumingInitial() + 0.5); //0.5 for thermostat assuming it is ON
+	
+	pthread_mutex_unlock(&(shm->mutex_enerin));
+        pthread_mutex_unlock(&(shm->mutex_inuse));
+        detachSharedMemory(shm);
 }
 

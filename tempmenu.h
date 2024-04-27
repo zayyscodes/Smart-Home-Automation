@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include "shm.h"
 
 #ifndef TEMPMENU_H
 #define TEMPMENU_H
 
-void settemp(void);
+int settemp(void);
 
 #endif

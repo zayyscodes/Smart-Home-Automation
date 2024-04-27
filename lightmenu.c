@@ -4,9 +4,12 @@
 #include <unistd.h>
 #include <string.h>
 #include "lightmenu.h"
+#include "shm.h"
 
 #define MAX 100
 #define LEN 1024
+
+extern SmartHome* shm; //pointer to shared memory
 
 typedef struct {
     char area[LEN];
