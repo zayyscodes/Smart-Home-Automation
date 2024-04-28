@@ -9,16 +9,6 @@
 
 #define SHM_SIZE 1024  // Size of shared memory segment
 #define LEN 1024 
-#define NUM 100
-
-// Structure to define Task array
-typedef struct {
-    char type[LEN]; //light, temp or appliances
-    double arrtime;
-    double exetime;
-    double burst;
-} TASKS;
-
 
 // Structure to hold shared data
 typedef struct {
@@ -27,8 +17,6 @@ typedef struct {
     int secure; //flag whether security setting is enabled
     int preftemp;
     int svmd; //flag whether energy save mode is on or not
-    TASKS task[NUM];
-    int cnt;
     pthread_mutex_t mutex_enerin;  // Mutex for protecting enerin
     pthread_mutex_t mutex_inuse;  // Mutex for protecting inuse
     pthread_mutex_t mutex_preftemp;  // Mutex for protecting preftemp
@@ -36,10 +24,12 @@ typedef struct {
     pthread_mutex_t mutex_tasks;  // Mutex for protecting tasks 
 } SmartHome;
 
-SmartHome* getshm();
-void setshm(SmartHome* shm);
-void initialise(SmartHome* shm);
-void detachSharedMemory(SmartHome* shm);
+
+SmartHome *getshm();
+void setshm(SmartHome *shm);
+void initialise(SmartHome *shm);
+void tempchange(SmartHome *shm);
+void detachSharedMemory(SmartHome *shm);
 
 #endif
 

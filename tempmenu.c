@@ -10,7 +10,7 @@
 
 #define MAX 1024
 
-extern SmartHome* shm; //pointer to shared memory
+extern SmartHome *shm; //pointer to shared memory
 
 // F U N C   T O   R E A D   C S V   F I L E    T H R O U G H    T H R E A D
 void* get_temp_data(void* arg) {
@@ -56,7 +56,7 @@ void* get_temp_data(void* arg) {
 
 int settemp(void) {
     srand(time(NULL));
-    int sno = rand() % 200 + 1;
+    int sno = rand() % 100 + 1;
     pthread_t input;
     int* temp;
 
@@ -82,28 +82,27 @@ int settemp(void) {
 
 // F U N C   T O   S E T   T H E R M O S T A T 
 void* temperature_sensor(void* arg) {
+    shm = getshm();
     while (1) {
         // Simulate temperature reading
     	int temp = settemp();
-        printf("Temperature Sensor - Temperature: %d°C\n", temp);
+        printf("\n\n\nTemperature Sensor Reading: %d°C\n", temp);
         
         if (temp < shm->preftemp){
         	printf("Thermostat set to %d\n", shm->preftemp);
-        	printf("Temperture increased by %d\n", (shm->preftemp-temp));
-        	//energy consumption increased as heat produced
+        	printf("Temperture increased by %d\n\n\n", (shm->preftemp-temp));
         } else if (temp > shm->preftemp){
         	printf("Thermostat set to %d\n", shm->preftemp);
-        	printf("Temperture decreased by %d\n", (temp-shm->preftemp));
-        	//energy consumption decreased as heat reduced
+        	printf("Temperture decreased by %d\n\n\n", (temp-shm->preftemp));
         } else {
-        	printf("No change to thermostat.\n");
+        	printf("No change to thermostat.\n\n\n");
         }
 	
         // Update energy data
 
-        sleep(rand() % 6 + 5); // Simulate reading every 5 to 10 seconds
+        sleep(rand() % 6 + 25); // Simulate reading every 25 to 30 seconds
     }
-
+    detachSharedMemory(shm);
     pthread_exit(NULL);
 }
 

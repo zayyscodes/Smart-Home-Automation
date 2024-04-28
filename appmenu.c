@@ -8,7 +8,7 @@
 #define MAX 100
 #define LEN 1024
 
-extern SmartHome* shm; //pointer to shared memory
+extern SmartHome *shm; //pointer to shared memory
 
 typedef struct{
 	char name[LEN];

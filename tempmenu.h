@@ -8,5 +8,7 @@
 #define TEMPMENU_H
 
 int settemp(void);
+void changepref();
+void* temperature_sensor(void* arg);
 
 #endif
