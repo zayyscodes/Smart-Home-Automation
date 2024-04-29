@@ -7,6 +7,7 @@
 #include "shm.h"
 #include <time.h>
 #include <unistd.h>
+#include "scheduling.h"
 
 #define MAX 1024
 
@@ -82,7 +83,7 @@ int settemp(void) {
 
 // F U N C   T O   S E T   T H E R M O S T A T 
 void* temperature_sensor(void* arg) {
-    shm = getshm();
+   // shm = getshm();
     while (1) {
         // Simulate temperature reading
     	int temp = settemp();
@@ -91,9 +92,11 @@ void* temperature_sensor(void* arg) {
         if (temp < shm->preftemp){
         	printf("Thermostat set to %d\n", shm->preftemp);
         	printf("Temperture increased by %d\n\n\n", (shm->preftemp-temp));
+        	write_task_to_pipe("thermoinc");
         } else if (temp > shm->preftemp){
         	printf("Thermostat set to %d\n", shm->preftemp);
         	printf("Temperture decreased by %d\n\n\n", (temp-shm->preftemp));
+        	write_task_to_pipe("thermodec");
         } else {
         	printf("No change to thermostat.\n\n\n");
         }
@@ -102,7 +105,7 @@ void* temperature_sensor(void* arg) {
 
         sleep(rand() % 6 + 25); // Simulate reading every 25 to 30 seconds
     }
-    detachSharedMemory(shm);
+   // detachSharedMemory(shm);
     pthread_exit(NULL);
 }
 

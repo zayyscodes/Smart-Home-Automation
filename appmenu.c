@@ -4,6 +4,7 @@
 #include <string.h>
 #include "appmenu.h"
 #include "shm.h"
+#include "scheduling.h"
 
 #define MAX 100
 #define LEN 1024
@@ -87,17 +88,27 @@ void* switchcsv(void* arg){
   	  }
   	 
   	  if (strcmp(name, app.name) == 0) {
-  	      fseek(file, linepos, SEEK_SET);
-  	      char *newline_pos = strchr(line, '\n');
-  	      if (newline_pos)
-  	 		 *newline_pos = '\0';
+  	      if ((shm->inuse + app.watt) <= shm->enerin){
+  	      	fseek(file, linepos, SEEK_SET);
+	  	      char *newline_pos = strchr(line, '\n');
+	  	      if (newline_pos)
+	  	 		 *newline_pos = '\0';
 
-            app.stat = (app.stat == 0) ? 1 : 0;
-            flag = app.stat;
+		    app.stat = (app.stat == 0) ? 1 : 0;
+		    flag = app.stat;
+		    
+		    if (app.watt >= 1.75)
+		    	write_task_to_pipe("appover");
+		    else if (app.watt < 1.75)
+		    	write_task_to_pipe("appunder");
+		    
 
-              fprintf(file, "%s,%s,%.2f,%d\n", app.name, app.area, app.watt, flag);
-  	      break; // Exit the loop after the modification is done
-  	  }
+		    fprintf(file, "%s,%s,%.2f,%d\n", app.name, app.area, app.watt, flag);
+	  	    break; // Exit the loop after the modification is done
+	  	  }
+  	      } else if ((shm->inuse + app.watt) > shm->enerin){
+  	      	printf("Energy consumption exceeded Energy Input.");
+  	      }
 	}
     
 	fclose(file);

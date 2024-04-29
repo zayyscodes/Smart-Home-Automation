@@ -1,0 +1,7 @@
+processes,deet,type,burst
+thermoinc,Thermostat Control (INC.),Temperature Control,48
+thermodec,Thermostat Control (DEC.),Temperature Control,23
+appover,Appliance over 1.75kWh,Appliance Control,84
+appunder,Appliance under 1.75kWh,Appliance Control,65
+lighton,Lights On/Off,Light Automation,11
+lockdown,Security Breach,Security,33

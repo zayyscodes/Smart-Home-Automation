@@ -5,6 +5,7 @@
 #include <string.h>
 #include "lightmenu.h"
 #include "shm.h"
+#include "scheduling.h"
 
 #define MAX 100
 #define LEN 1024
@@ -101,6 +102,8 @@ void* switchincsv(void* arg) {
 
             light.stat = (light.stat == 0) ? 1 : 0;
             flag = light.stat;
+            
+            write_task_to_pipe("lighton");
 
             fprintf(file, "%s,%d,%.2f,%d\n", light.area, light.num, light.watt, flag);
             break;

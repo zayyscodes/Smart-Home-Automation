@@ -11,6 +11,7 @@
 #include "tempmenu.h"
 #include "shm.h"
 #include "passwordcheck.h"
+//#include "scheduling.h"
 
 //KIYA KIYA REHTA HAI: SHARED MEMORY LAGANA & TASK SCHEDULING
 // PLUS HAR JAGA E CONSUME KI RESTRICTION
@@ -81,6 +82,7 @@ int main(){
 		stop();
 		exit(EXIT_FAILURE);
 	} else ;*/
+	clock_t start;
 	shm = getshm();
         if (shm == NULL) {
     	   printf("Failed to initialize shared memory.\n");
@@ -90,12 +92,11 @@ int main(){
 	setshm(shm);
 	
 	pthread_t tempcon;
-	pthread_create(&tempcon, NULL, temperature_sensor, (void *)&shm->preftemp);
+	pthread_create(&tempcon, NULL, temperature_sensor, (void *)start);
 
 	
 	
-	int x = 1;
-	while (x){	
+	while (1){	
 		header();
 		
 		setinput();
@@ -119,12 +120,13 @@ int main(){
 		if (shm->inuse > shm->enerin)
 		printf("\nBackup Batteries are in use.");
 		
-		int ch;
+		int ch = -1;
 		printf("\n\nMenu:");
 		printf("\n1, Light Automation\n2, Temperature Control\n3, Appliances Control\n4, Exit");
 		printf("\nEnter Choice: ");
-		scanf("%d", &ch);
-		printf("%d\n", ch);
+		getchar(); // Consume newline character from previous input
+scanf("%d", &ch);
+printf("%d\n", ch);
 		switch(ch){
 			case 1:{
 				//printf("\nLight selected!");
@@ -153,14 +155,13 @@ int main(){
 		    
 			default:{
 				printf("\nInvalid Choice.");
-				x = 0;
+				//x = 0;
 			break;
 			}
 		}
 	}
 	
-	pthread_join(tempcon, NULL);
-	
+	pthread_join(tempcon, NULL);	
 }
 
 
