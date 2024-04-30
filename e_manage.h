@@ -10,8 +10,8 @@
 
 void setinput();
 void setconsume(float x);
-float getenergy(void);
-float consumingInitial(void);
+void getenergy(void);
+void consumingInitial(void);
 void* get_energy_data(void* arg);
 
 #endif
