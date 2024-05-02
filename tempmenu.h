@@ -10,5 +10,6 @@
 int settemp(void);
 void changepref();
 void* temperature_sensor(void* arg);
+void displaytempmenu();
 
 #endif

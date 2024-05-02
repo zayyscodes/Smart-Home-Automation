@@ -22,3 +22,5 @@ int logIn(struct User users[], int usernum);
 // Function to load user data from file
 int loadUserData(struct User users[], int *usernum);
 
+int getchoice();
+

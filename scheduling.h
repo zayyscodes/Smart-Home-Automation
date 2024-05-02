@@ -5,8 +5,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#define READ 0
+#define WRITE 1
+
 #define FIELDS 1000
 #define LEN 1024
+
+// Predefined file descriptors for pipe operations
+extern int pipe_fd[2];
 
 // Structure to define Task array
 typedef struct {
@@ -16,8 +22,7 @@ typedef struct {
     double burst;
 } TASKS;
 
-// Predefined file descriptors for pipe operations
-extern int pipe_fd[2];
+int checkArray(int array[], int size);
 
 TASKS* readcsv(const char* filename, const char* name);
 
@@ -25,7 +30,14 @@ TASKS* readcsv(const char* filename, const char* name);
 void write_task_to_pipe(const char* type);
 
 // Function to read a TASKS struct from a pipe
-void read_task_from_pipe(TASKS *task_array, int *current_index);
+void read_task_from_pipe(TASKS *task_array);
 
 void scheduling(void);
+
+
+void fcfs(TASKS *tasks);
+
+void sjf(TASKS *tasks);
+
+void rr(TASKS *tasks, int time_quantum);
 

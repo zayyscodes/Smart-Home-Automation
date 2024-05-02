@@ -6,11 +6,13 @@
 #include "lightmenu.h"
 #include "shm.h"
 #include "scheduling.h"
-
+#include "mutexes.h"
 #define MAX 100
 #define LEN 1024
 
+extern pthread_mutex_t mutex;
 extern SmartHome *shm; //pointer to shared memory
+extern int flags[5];
 
 typedef struct {
     char area[LEN];
@@ -75,9 +77,9 @@ void* switchincsv(void* arg) {
     int header = 0;
     char line[LEN];
     long int header_end = ftell(file);
+    int flag_updated = 0; // Declare and initialize flag_updated
 
     while (fgets(line, sizeof(line), file)) {
-
         if (!header) {
             header = 1;
             continue;
@@ -102,8 +104,7 @@ void* switchincsv(void* arg) {
 
             light.stat = (light.stat == 0) ? 1 : 0;
             flag = light.stat;
-            
-            write_task_to_pipe("lighton");
+            flag_updated = 1; // Set flag_updated when flag is updated
 
             fprintf(file, "%s,%d,%.2f,%d\n", light.area, light.num, light.watt, flag);
             break;
@@ -115,7 +116,17 @@ void* switchincsv(void* arg) {
     printf("\n\nArea: %s\nNum: %d\nWatt: %.2f\n", light.area, light.num, light.watt);
     printf("Stat: %s\n", (light.stat == 0) ? "OFF" : "ON");
     printf("\nCSV file updated successfully.\n");
+	
+    // Lock mutex before calling write_task_to_pipe
+    pthread_mutex_lock(&mutex);
+    write_task_to_pipe("lighton");
+    printf("Writen to PIPE\n\n");
+    pthread_mutex_unlock(&mutex);
 }
+
+
+
+
 
 void togglee(LightData light[]) {
 shuru:
@@ -145,7 +156,7 @@ shuru:
     scanf(" %c", &ch);
 
     if (ch == 'N' || ch == 'n')
-        goto shuru;
+        ; //goto shuru;
     else if (ch == 'Y' || ch == 'y') {
         pthread_t toggle;
         if (pthread_create(&toggle, NULL, switchincsv, (void*)&light[sno]) != 0) {
@@ -342,7 +353,7 @@ sort:
 
     default: {
         printf("\nInvalid Choice.");
-        goto again;
+        //goto again;
         break;
     }
 
@@ -393,7 +404,7 @@ menu:
     switch (choice) {
 	    case 1: {
 			displaylistt();
-			goto menu;
+			return;
 		break;
 	    }
 
@@ -419,7 +430,7 @@ menu:
 		for (int i = 0; entries[i].area[0] != '\0'; i++) {
 		    printf("Area: %s, Num: %d, Watt: %.2fkWh\n", entries[i].area, entries[i].num, entries[i].watt);
 		}
-		goto menu;
+		return;
 		break;
 	    }
 	    

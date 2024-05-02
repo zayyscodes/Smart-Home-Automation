@@ -86,3 +86,12 @@ int loadUserData(struct User users[], int *usernum) {
     }
 }
 
+int getchoice(){
+    int ch;
+    printf("\nEnter Choice: ");
+    scanf("%d", &ch);
+    while(getchar() != '\n'); // Clear input buffer
+    printf("%d\n", ch);
+    return ch;
+}
+

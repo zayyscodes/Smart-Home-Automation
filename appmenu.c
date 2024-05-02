@@ -9,6 +9,7 @@
 #define MAX 100
 #define LEN 1024
 
+extern pthread_mutex_t mutex;
 extern SmartHome *shm; //pointer to shared memory
 
 typedef struct{
@@ -97,10 +98,15 @@ void* switchcsv(void* arg){
 		    app.stat = (app.stat == 0) ? 1 : 0;
 		    flag = app.stat;
 		    
-		    if (app.watt >= 1.75)
+		    if (app.watt >= 1.75){
+		    	pthread_mutex_lock(&mutex);
 		    	write_task_to_pipe("appover");
-		    else if (app.watt < 1.75)
-		    	write_task_to_pipe("appunder");
+		    	pthread_mutex_unlock(&mutex);
+		    } else if (app.watt < 1.75){
+		    	pthread_mutex_lock(&mutex);
+		  	write_task_to_pipe("appunder");
+		    	pthread_mutex_unlock(&mutex);
+		    }
 		    
 
 		    fprintf(file, "%s,%s,%.2f,%d\n", app.name, app.area, app.watt, flag);

@@ -11,6 +11,7 @@
 
 #define MAX 1024
 
+extern pthread_mutex_t mutex;
 extern SmartHome *shm; //pointer to shared memory
 
 // F U N C   T O   R E A D   C S V   F I L E    T H R O U G H    T H R E A D
@@ -90,13 +91,18 @@ void* temperature_sensor(void* arg) {
         printf("\n\n\nTemperature Sensor Reading: %d°C\n", temp);
         
         if (temp < shm->preftemp){
-        	printf("Thermostat set to %d\n", shm->preftemp);
-        	printf("Temperture increased by %d\n\n\n", (shm->preftemp-temp));
-        	write_task_to_pipe("thermoinc");
+        	printf("Temperature set to %d\n", shm->preftemp);
+        	printf("Thermostat increased by %d\n\n\n", (shm->preftemp-temp));
+        	pthread_mutex_lock(&mutex);
+	        write_task_to_pipe("thermoinc");
+	        pthread_mutex_unlock(&mutex);
         } else if (temp > shm->preftemp){
-        	printf("Thermostat set to %d\n", shm->preftemp);
-        	printf("Temperture decreased by %d\n\n\n", (temp-shm->preftemp));
+        	printf("Temperature set to %d\n", shm->preftemp);
+        	printf("Thermostat decreased by %d\n\n\n", (temp-shm->preftemp));
         	write_task_to_pipe("thermodec");
+        	pthread_mutex_lock(&mutex);
+	        write_task_to_pipe("thermodec");
+	        pthread_mutex_unlock(&mutex);
         } else {
         	printf("No change to thermostat.\n\n\n");
         }
@@ -108,6 +114,41 @@ void* temperature_sensor(void* arg) {
    // detachSharedMemory(shm);
     pthread_exit(NULL);
 }
+
+
+
+void displaytempmenu(){
+tmenu:
+    int choice;
+    printf("\n\nMenu:\n1, Set Thermostat\n2, Change Preferred Time\n3, Go to Main menu\nEnter Choice: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+	    case 1: {
+			pthread_t tempcon;
+			pthread_create(&tempcon, NULL, temperature_sensor, NULL);
+			pthread_join(tempcon, NULL);
+			goto tmenu;
+		break;
+	    }
+
+	    case 2: {
+		tempchange(shm);
+		break;
+	    }
+	    
+	    case 3: {
+		return;
+	    }
+
+	    default: {
+		printf("\nInvalid Choice.");
+		goto tmenu;
+		break;
+	    }
+    }
+}
+
 
 
 
