@@ -7,13 +7,11 @@
 #define idlen 50
 #define pwlen 50
 
-// Structure to hold user information
 struct User {
     char id[idlen];
     char password[pwlen];
 };
 
-// Function to sign up
 void signUp(struct User users[], int *usernum) {
     if (*usernum >= MAX_USERS) {
         printf("Maximum number of users reached!\n");
@@ -38,40 +36,38 @@ void signUp(struct User users[], int *usernum) {
     (*usernum)++;
 }
 
-// Function to log in
 int logIn(struct User users[], int usernum) {
-int tries = 0;
+    int tries = 0;
 loginn:
-    if (tries < 3){
-    	    char loginID[idlen];
-	    char password[pwlen];
+    if (tries < 3) {
+        char loginID[idlen];
+        char password[pwlen];
 
-	    printf("Enter login ID: ");
-	    scanf("%s", loginID);
+        printf("Enter login ID: ");
+        scanf("%s", loginID);
 
-	    printf("Enter password: ");
-	    scanf("%s", password);
+        printf("Enter password: ");
+        scanf("%s", password);
 
-	    int found = 0;
-	    for (int i = 0; i < usernum; i++) {
-		if (strcmp(users[i].id, loginID) == 0 && strcmp(users[i].password, password) == 0) {
-		    printf("Login successful!\n");
-		    found = 1;
-		    break;
-		}
-	    }
+        int found = 0;
+        for (int i = 0; i < usernum; i++) {
+            if (strcmp(users[i].id, loginID) == 0 && strcmp(users[i].password, password) == 0) {
+                printf("Login successful!\n");
+                found = 1;
+                break;
+            }
+        }
 
-	    if (!found) {
-		printf("Incorrect login ID or password. Please try again.\n");
-		tries++;
-		goto loginn;
-	    } else 
-	    	return 1;
+        if (!found) {
+            printf("Incorrect login ID or password. Please try again.\n");
+            tries++;
+            goto loginn;
+        } else 
+            return 1;
     } else 
-    	return 0;
+        return 0;
 }
 
-// Function to load user data from file
 int loadUserData(struct User users[], int *usernum) {
     FILE *file = fopen("user.txt", "r");
     if (file != NULL) {
@@ -86,12 +82,11 @@ int loadUserData(struct User users[], int *usernum) {
     }
 }
 
-int getchoice(){
+int getchoice() {
     int ch;
     printf("\nEnter Choice: ");
     scanf("%d", &ch);
-    while(getchar() != '\n'); // Clear input buffer
-    printf("%d\n", ch);
+    while (getchar() != '\n'); // Clear input buffer
     return ch;
 }
 

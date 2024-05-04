@@ -9,9 +9,10 @@
 #define ECONS_H
 
 void setinput();
-void setconsume(float x);
 void getenergy(void);
+void setconsume();
 void consumingInitial(void);
 void* get_energy_data(void* arg);
+void setenergysave();
 
 #endif

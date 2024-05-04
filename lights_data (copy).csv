@@ -1,13 +1,10 @@
 area,num,watt,flag
+Backyard,1,0.20,0
 Dining Area,6,0.10,1
-Kitchen Cabinet,4,0.05,1
-Drawing Room,8,0.10,1
-Bedroom 1,8,0.05,1
-Bedroom 2,6,0.05,0
+Drawing Room,8,0.10,0
 Living Room,4,0.10,0
-Front Porch,2,0.08,1
-
-Backyard,1,0.2,0
+Front Porch,2,0.08,0
+Kitchen Cabinet,4,0.05,0
+Bedroom 1,8,0.05,0
+Bedroom 2,6,0.05,0
 Garage,4,0.05,0
-
-

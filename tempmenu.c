@@ -1,4 +1,3 @@
-// get input from csv file and set thermostat accordingly
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -12,16 +11,15 @@
 #define MAX 1024
 
 extern pthread_mutex_t mutex;
-extern SmartHome *shm; //pointer to shared memory
+extern SmartHome *shm;
 
-// F U N C   T O   R E A D   C S V   F I L E    T H R O U G H    T H R E A D
 void* get_temp_data(void* arg) {
     int ssno = *(int*)arg;
-    int* temp = malloc(sizeof(int)); // Allocate memory for int return value
+    int* temp = malloc(sizeof(int)); 
 
     if (!temp) {
         fprintf(stderr, "Memory allocation failed\n");
-        return NULL; // Return NULL on memory allocation failure
+        return NULL;
     }
 
     const char *filename = "temp_rand.csv"; 
@@ -29,7 +27,7 @@ void* get_temp_data(void* arg) {
     if (!file) {
         perror("Failed to open the file");
         free(temp);
-        return NULL; // Return NULL on file open error
+        return NULL;
     }
 
     char line[MAX];
@@ -41,7 +39,7 @@ void* get_temp_data(void* arg) {
         sscanf(line, "%d,%d", &sno, &temp_in);
         if (sno == ssno) {
             found = 1;
-            *temp = temp_in; // Store the found temp value
+            *temp = temp_in; 
             break;
         }
     }
@@ -50,10 +48,10 @@ void* get_temp_data(void* arg) {
 
     if (!found) {
         printf("Serial number %d not found in the file.\n", ssno);
-        *temp = 0; // Set temp to 0 if serial number not found
+        *temp = 0; 
     }
 
-    return (void*)temp; // Return the pointer to temp
+    return (void*)temp;
 }
 
 int settemp(void) {
@@ -62,60 +60,59 @@ int settemp(void) {
     pthread_t input;
     int* temp;
 
-    // Create a thread
     if (pthread_create(&input, NULL, get_temp_data, &sno) != 0) {
         fprintf(stderr, "Error creating thread\n");
         return 0;
     }
 
-    // Join the thread and retrieve the temp value
     if (pthread_join(input, (void**)&temp) != 0) {
         fprintf(stderr, "Error joining thread\n");
         return 0;
     }
 
-    // Store the temp value in a int variable and free the memory
     int result = *temp;
-    free(temp); // Free the allocated memory
+    free(temp); 
 
     return result;
 }
 
-
-// F U N C   T O   S E T   T H E R M O S T A T 
 void* temperature_sensor(void* arg) {
-   // shm = getshm();
-    while (1) {
-        // Simulate temperature reading
-    	int temp = settemp();
-        printf("\n\n\nTemperature Sensor Reading: %d°C\n", temp);
-        
-        if (temp < shm->preftemp){
-        	printf("Temperature set to %d\n", shm->preftemp);
-        	printf("Thermostat increased by %d\n\n\n", (shm->preftemp-temp));
-        	pthread_mutex_lock(&mutex);
-	        write_task_to_pipe("thermoinc");
-	        pthread_mutex_unlock(&mutex);
-        } else if (temp > shm->preftemp){
-        	printf("Temperature set to %d\n", shm->preftemp);
-        	printf("Thermostat decreased by %d\n\n\n", (temp-shm->preftemp));
-        	write_task_to_pipe("thermodec");
-        	pthread_mutex_lock(&mutex);
-	        write_task_to_pipe("thermodec");
-	        pthread_mutex_unlock(&mutex);
-        } else {
-        	printf("No change to thermostat.\n\n\n");
-        }
-	
-        // Update energy data
-
-        sleep(rand() % 6 + 25); // Simulate reading every 25 to 30 seconds
+    int temp = settemp();
+    printf("\n\n\nTemperature Sensor Reading: %d°C\n", temp);
+    
+    if (temp < shm->preftemp){
+        printf("Temperature set to %d\n", shm->preftemp);
+        printf("Thermostat increased by %d\n\n\n", (shm->preftemp-temp));
+        pthread_mutex_lock(&mutex);
+        write_task_to_pipe("thermoinc");
+        pthread_mutex_unlock(&mutex);
+    } else if (temp > shm->preftemp){
+        printf("Temperature set to %d\n", shm->preftemp);
+        printf("Thermostat decreased by %d\n\n\n", (temp-shm->preftemp));
+        pthread_mutex_lock(&mutex);
+        write_task_to_pipe("thermodec");
+        pthread_mutex_unlock(&mutex);
+    } else {
+        printf("No change to thermostat.\n\n\n");
     }
-   // detachSharedMemory(shm);
+    
+    FILE* txt_file = fopen("task_assign_info.txt", "a");
+    if (txt_file == NULL) {
+        perror("Failed to open text file");
+        return NULL;
+    }
+
+    fprintf(txt_file, "\n\n\n****TEMPERATURE CONTROL****\n");
+    fprintf(txt_file, "Temperature Sensor Reading: %d°C\n", temp);
+    fprintf(txt_file, "Temperature set to %d°C\n", shm->preftemp);
+    fprintf(txt_file, "Thermostat increased by %d\n", (shm->preftemp - temp)); 
+
+    fclose(txt_file);
+
+    printf("Text file updated successfully.\n");
+
     pthread_exit(NULL);
 }
-
-
 
 void displaytempmenu(){
 tmenu:
@@ -124,33 +121,28 @@ tmenu:
     scanf("%d", &choice);
 
     switch (choice) {
-	    case 1: {
-			pthread_t tempcon;
-			pthread_create(&tempcon, NULL, temperature_sensor, NULL);
-			pthread_join(tempcon, NULL);
-			goto tmenu;
-		break;
-	    }
+        case 1: {
+            pthread_t tempcon;
+            pthread_create(&tempcon, NULL, temperature_sensor, NULL);
+            pthread_join(tempcon, NULL);
+            goto tmenu;
+        break;
+        }
 
-	    case 2: {
-		tempchange(shm);
-		break;
-	    }
-	    
-	    case 3: {
-		return;
-	    }
+        case 2: {
+        	tempchange(shm);
+        break;
+        }
+        
+        case 3: {
+        return;
+        }
 
-	    default: {
+        default: {
 		printf("\nInvalid Choice.");
 		goto tmenu;
-		break;
-	    }
+        break;
+        }
     }
 }
-
-
-
-
-
 

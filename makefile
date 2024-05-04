@@ -1,2 +1,2 @@
 make: 
-	gcc -o test scheduling.c tempmenu.c passwordcheck.c appmenu.c lightmenu.c e_manage.c shm.c mainn.c -lpthread -lrt
+	gcc -o test e_manage.c appmenu.c scheduling.c passwordcheck.c tempmenu.c lightmenu.c shm.c mainn.c -lpthread -lrt
