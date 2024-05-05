@@ -427,9 +427,10 @@ menuu:
                 }
                 
                 printf("Entries with flag = 1:\n");
-                for (int i = 0; entries[i].area[0] != '\0'; i++) {
-                    printf("Appliance: %s, Area: %s, Energy Consumption: %.2fkWh\n", entries[i].name, entries[i].area, entries[i].watt);
-                }
+                for (int i = 0; entries[i].name[0] != '\0'; i++) {
+		    printf("Appliance: %s, Area: %s, Energy Consumption: %.2fkWh\n", entries[i].name, entries[i].area, entries[i].watt);
+		}
+		goto menuu;
                 break;
             }
             
