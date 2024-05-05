@@ -132,3 +132,20 @@ void* switchincsv(void* arg) {                  // Function to switch lights on/
 
     pthread_exit(NULL);       // Exit thread
 }
+
+/*We used `malloc` to dynamically allocate memory for the array of `LightData` structures (`light`). Here's why:
+
+1. **Dynamic Memory Allocation**: Unlike static memory allocation, where memory is allocated at compile-time and cannot be changed during runtime, dynamic memory allocation allows us 
+to allocate memory during program execution. This is useful when the size of the data structure is not known at compile-time or when the size may vary.
+
+2. **Variable Array Size**: In this case, the size of the `light` array is determined by the number of entries read from the CSV file. Since we don't know this size beforehand, 
+we use `malloc` to allocate memory for the array dynamically based on the actual number of entries read.
+
+3. **Avoiding Fixed Size Limitations**: Using `malloc` allows us to avoid fixed size limitations. If we used a statically sized array, we would have to define its size beforehand, 
+potentially leading to wasted memory if it's too large or runtime errors if it's too small.
+
+4. **Flexibility**: Dynamically allocated memory can be resized or deallocated as needed during program execution, providing flexibility and efficiency in memory usage.
+
+5. **Efficiency**: `malloc` allocates memory from the heap, which is typically larger and more flexible than the stack. This can be more efficient for large or variable-sized data structures.
+
+However, it's essential to remember to free the dynamically allocated memory using `free` when it's no longer needed to prevent memory leaks. In this code, we didn't free the memory explicitly, but it should be freed once it's no longer used to avoid memory leaks.*/
