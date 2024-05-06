@@ -1,38 +1,39 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <ctype.h>
-#include <pthread.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <time.h>
-#include "lightmenu.h"
-#include "e_manage.h"
-#include "appmenu.h"
-#include "tempmenu.h"
-#include "shm.h"
-#include "passwordcheck.h"
-#include "scheduling.h"
+#include <stdio.h> // Standard I/O operations
+#include <stdlib.h> // Standard library functions
+#include <unistd.h> // POSIX operating system API
+#include <fcntl.h> // File control options
+#include <string.h> // String manipulation functions
+#include <sys/stat.h> // File information functions
+#include <ctype.h> // Character handling functions
+#include <pthread.h> // POSIX threads
+#include <sys/mman.h> // Memory management functions
+#include <sys/types.h> // System data types
+#include <sys/wait.h> // Waiting for process termination
+#include <time.h> // Time functions
+#include "lightmenu.h" // Header file for light menu functions
+#include "e_manage.h" // Header file for energy management functions
+#include "appmenu.h" // Header file for appliance menu functions
+#include "tempmenu.h" // Header file for temperature menu functions
+#include "shm.h" // Header file for shared memory functions
+#include "passwordcheck.h" // Header file for password check functions
+#include "scheduling.h" // Header file for scheduling functions
 
-#define MAX 1000
+#define MAX 1000 // Maximum number of users
 
-pthread_mutex_t update = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t file_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t update = PTHREAD_MUTEX_INITIALIZER; // Mutex for update operations
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex for critical sections
+pthread_mutex_t file_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex for file operations
 
-SmartHome *shm; //pointer to shared memory
-int lightupdated = 1;
-int appupdated = 1;
-int usernum = 0;
-struct User users[MAX_USERS];
+SmartHome *shm; // Pointer to shared memory
+int lightupdated = 1; // Flag indicating whether lights have been updated
+int appupdated = 1; // Flag indicating whether appliances have been updated
+int usernum = 0; // Number of users
+struct User users[MAX_USERS]; // Array to store user information
 
-void* turnoff(void* arg);
-int login();
+void* turnoff(void* arg); // Thread function to turn off lights and appliances
+int login(); // Function to handle user login
 
+// Function to display system header
 void header(){
 	system("clear");
 	printf("\n\n\t\t\t        Smart-Home System\n"); 
@@ -56,42 +57,44 @@ void header(){
 	printf("\nIn consumption: %.2fkWh", shm->inuse);
 }
 
+// Function to stop and wait for user input
 void stop(){
 	printf("\n\nPress any key to continue...\n");
 	getchar();
 }
 
-
-
-
-
+// Main function
 int main(){
+	// User login
 	int log = login();
 	if (log == 0){
 		printf("Unable to access portal account.\n");
 		exit(EXIT_FAILURE);
 	} else
 	;
-	pthread_mutex_init(&mutex,NULL); 	//initializing as soon as a user has logged in
-	pthread_mutex_init(&update,NULL); 	//initializing as soon as a user has logged in
-	//pthread_mutex_init(&read,NULL); 	//initializing as soon as a user has logged in
-	pthread_mutex_init(&file_mutex,NULL); 	//initializing as soon as a user has logged in
+	
+	// Initialize mutexes
+	pthread_mutex_init(&mutex,NULL);
+	pthread_mutex_init(&update,NULL);
+	pthread_mutex_init(&file_mutex,NULL);
 	
 	clock_t start;
 	shm = getshm();
-        if (shm == NULL) {
-    	   printf("Failed to initialize shared memory.\n");
-     	   exit(EXIT_FAILURE);
+    if (shm == NULL) {
+    	printf("Failed to initialize shared memory.\n");
+     	exit(EXIT_FAILURE);
 	}
 	initialise(shm);
 	setshm(shm);
 	
+	// Main program loop
 	start:
 		setinput();
 		header();
 		
 	hey:	
 		
+		// Automatic shutdown if energy consumption exceeds input
 		if (shm->enerin < shm->inuse){
 			char chin;
 			printf("\n\nOver consumption.\nDo you want to proceed with automatic shutdown? (Y/N): ");
@@ -113,14 +116,16 @@ int main(){
 			
 		}
 		
+		// Display menu options
 		printf("\n\nMenu:");
 		printf("\n1, Light Automation\n2, Temperature Control\n3, Appliances Control\n4, Apply Scheduling\n5, Switch to energy saver mode\n6, Logout");
 		
 		int ch = getchoice();
 		
+		// Handle menu choices
 		switch(ch){
 			case 1:{
-				//printf("\nLight selected!");
+				// Light automation
 				system("clear");
 				header();
 				displaylightmenu();
@@ -132,7 +137,7 @@ int main(){
 			}
 			
 			case 2:{
-				//printf("\nTemp selected");
+				// Temperature control
 				system("clear");
 				header();
 				displaytempmenu();
@@ -141,7 +146,7 @@ int main(){
 			}
 			
 			case 3:{
-				//printf("\nAppliances chose.");
+				// Appliances control
 				system("clear");
 				header();
 				displayappmenu();
@@ -153,6 +158,7 @@ int main(){
 			}
 			
 			case 4: {
+				// Apply scheduling
 				scheduling();
 				printf("Would you like to logout? (Y/N): ");
 				char chlo;
@@ -166,6 +172,7 @@ int main(){
 			}
 			
 			case 5: {
+				// Switch to energy saver mode
 				if (shm->svmd == 0){
 					printf("Energy Saver Mode will only allow fifty-percent of the lights to switch on,\nand appliances under 1.75kWh");
 					printf("\nDo you want to enable Energy Saver Mode? (Y/N): ");
@@ -197,26 +204,22 @@ int main(){
 		    
 			default:{
 				printf("\nInvalid Choice.");
-				//x = 0;
 			break;
 			}
 		}
 	
-	pthread_mutex_destroy(&mutex);
+	pthread_mutex_destroy(&mutex); // Destroy mutex
 }
 
-
-
-
-
-
+// Thread function to turn off lights and appliances
 void* turnoff(void* arg) {
     // Define arrays to hold data
     LightData light[MAX];
     AppData app[MAX];
     
-    pthread_mutex_lock(&file_mutex);
+    pthread_mutex_lock(&file_mutex); // Lock file mutex
 
+    // Open lights file
     FILE *file1 = fopen("lights_data (copy).csv", "r+");
     if (!file1) {
         perror("Failed to open the file");
@@ -227,6 +230,7 @@ void* turnoff(void* arg) {
     int index = 0;
     int header = 0;
 
+    // Read and update lights data
     while (fgets(line1, sizeof(line1), file1)) {
     	if (!header) {
 		header = 1;
@@ -242,11 +246,11 @@ void* turnoff(void* arg) {
     }
 
     fclose(file1);
-    pthread_mutex_unlock(&file_mutex);
+    pthread_mutex_unlock(&file_mutex); // Unlock file mutex
     
+    pthread_mutex_lock(&update); // Lock update mutex
     
-    pthread_mutex_lock(&update);
-    // Now for appliances
+    // Open appliances file
     FILE *file2 = fopen("appliances_data (copy).csv", "r+");
     if (!file2) {
         perror("Failed to open the file");
@@ -258,11 +262,9 @@ void* turnoff(void* arg) {
 	header = 0;
     while (fgets(line2, sizeof(line2), file2)) {
     	if (!header) {
-                header = 1;
-                continue;
-            }
-
-
+            header = 1;
+            continue;
+        }
 
         sscanf(line2, "%[^,],%[^,],%f,%d", app[iapp].name, app[iapp].area, &app[iapp].watt, &app[iapp].stat);
         if (app[iapp].stat == 1) {
@@ -273,94 +275,108 @@ void* turnoff(void* arg) {
         iapp++;
     }
 
-    fclose(file2);FILE *file = fopen("appliances_data (copy).csv", "r+");
-    if (!file) {
-        perror("Failed to open the file");
-        return NULL;
-    }
+    fclose(file2);
+    
+    pthread_mutex_unlock(&update); // Unlock update mutex
 
-    char line[MAX];
-    iapp = 0;
-
-    while (fgets(line, sizeof(line), file)) {
-        // Check if the first character is a letter, if not, prepend a placeholder character
-        if (!isalpha(line[0])) {
-            memmove(line + 1, line, strlen(line) + 1);
-            line[0] = '#'; // Placeholder character
-        }
-
-        // Parse the line using sscanf
-        if (sscanf(line, "%[^,],%[^,],%f,%d", app[iapp].name, app[iapp].area, &app[iapp].watt, &app[iapp].stat) == 4) {
-            if (app[iapp].stat == 1) {
-                app[iapp].stat = 0; // Update the status
-                fseek(file, -strlen(line), SEEK_CUR); // Move back to the beginning of the line
-                fprintf(file, "%s,%s,%.2f,%d\n", app[iapp].name, app[iapp].area, app[iapp].watt, app[iapp].stat); // Write the updated line back to the file
-            }
-        } else {
-            fprintf(stderr, "Error parsing line: %s\n", line);
-        }
-
-        iapp++;
-    }
-
-    fclose(file);
-    pthread_mutex_unlock(&update);
-
+    // Update consumption in shared memory
     pthread_mutex_lock(&(shm->mutex_inuse));
     printf("Consumption updated\n");
     setconsume();
     pthread_mutex_unlock(&(shm->mutex_inuse));
     
-    lightupdated = 1;
-    appupdated = 1;
+    lightupdated = 1; // Set light update flag
+    appupdated = 1; // Set appliance update flag
 
     // Lock mutex before calling write_task_to_pipe
     pthread_mutex_lock(&mutex);
     write_task_to_pipe("turnoff");
     printf("Written to ARRAY\n\n");
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&mutex); // Unlock mutex
     
     pthread_exit(NULL);
 }
 
+// Function to handle user login
 int login(){
 	system("clear");
-	login:
-	    int choice;
-	    int x = 0, data = 0;
+login:
+    int choice;
+    int x = 0, data = 0;
 
-	    data = loadUserData(users, &usernum);
+    data = loadUserData(users, &usernum); // Load user data
 
-	    if (data == 1){
-	    	printf("\n1. Sign Up\n2. Log In\n3. Exit\n");
-		printf("Enter your choice: ");
-		scanf("%d", &choice);
+    if (data == 1){
+    	printf("\n1. Sign Up\n2. Log In\n3. Exit\n");
+	printf("Enter your choice: ");
+	scanf("%d", &choice);
 
-		switch (choice) {
-		    case 1:
-		        signUp(users, &usernum);
-		        goto login;
-		        break;
-		    case 2:
-		        x = logIn(users, usernum);
-		        break;
-		    case 3:
-		        printf("Exiting...\n");
-		        stop();
-		        break;
-		    default:
-		        printf("Invalid choice. Please try again.\n");
-		        stop();
-		        break;
-		}
-	    } else if (data == 0) {
-	    	printf("You are requested to sign up first.\n");
-	    	signUp(users, &usernum);
-	    	goto login;
-	    }
-	    
-	    if (x == 1)
-	    	return 1; //access
-	    else
-	    	return 0;
+	switch (choice) {
+	    case 1:
+	        signUp(users, &usernum); // Sign up new user
+	        goto login;
+	        break;
+	    case 2:
+	        x = logIn(users, usernum); // Log in existing user
+	        break;
+	    case 3:
+	        printf("Exiting...\n");
+	        stop();
+	        break;
+	    default:
+	        printf("Invalid choice. Please try again.\n");
+	        stop();
+	        break;
+	}
+    } else if (data == 0) {
+    	printf("You are requested to sign up first.\n");
+    	signUp(users, &usernum); // Sign up new user
+    	goto login;
+    }
+    
+    if (x == 1)
+    	return 1; // Access granted
+    else
+    	return 0; // Access denied
 }
+
+
+/*Certainly! Let's go through each included header and understand why it's used and which functions 
+from those headers are being called in the code:
+
+1. **stdio.h**: This header is included for standard input and output operations. Functions like `printf`,
+`scanf`, and `getchar` are called for printing messages to the console and reading user input.
+
+2. **stdlib.h**: It provides general utility functions, including memory allocation (`malloc`, `free`) and 
+program termination (`exit`). Functions like `exit` are used for terminating the program in case of failure.
+
+3. **unistd.h**: This header provides access to POSIX operating system API. In this code, `system("clear")`
+is used to clear the console screen.
+
+4. **fcntl.h**: It provides functions for manipulating file descriptors. Although no specific function from 
+this header is called directly in the code you provided, it might be used indirectly by other libraries or system calls.
+
+5. **string.h**: This header is used for string manipulation functions such as `strlen`, `strcpy`, and `strcat`. 
+These functions are used extensively for parsing strings and manipulating file contents in the code.
+
+6. **sys/stat.h**: It provides functions to get information about files (e.g., `stat`). Although not explicitly 
+called in the code, it might be included for potential future use or as part of other libraries.
+
+7. **ctype.h**: This header provides functions for character handling, such as `isalpha`. These functions are 
+used for character validation and manipulation.
+
+8. **pthread.h**: It's used for POSIX threads. Functions like `pthread_create`, `pthread_mutex_init`, and 
+`pthread_mutex_lock` are called to create and manage threads and mutexes for thread synchronization.
+
+9. **sys/mman.h**: This header provides memory management functions, such as `mmap`. In this code, it's used 
+for memory mapping related operations, likely for shared memory management.
+
+10. **sys/types.h**: It defines various system data types. It's included for data type definitions used in 
+conjunction with other system headers.
+
+11. **sys/wait.h**: This header is used for functions related to process management and waiting for process 
+termination. In the code, `pthread_join` is called to wait for thread termination.
+
+12. **time.h**: It provides functions for manipulating time, such as `clock_t`. In this code, it's used for 
+measuring the execution time of certain operations.
+*/
