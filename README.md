@@ -1,32 +1,34 @@
-Smart Home System
+**Smart Home System
+**
 
-Project Proposal
 
-Introduction
+**Introduction**
 
 This project proposes an advanced smart home system that utilizes fundamental OS concepts to enhance efficiency, reliability, and scalability.
 
-Objectives
+**Objectives**
 
-Scalability: Implement a modular architecture using OS for easy scalability.
+**Scalability**: Implement a modular architecture using OS for easy scalability.
 
-Efficient Communication: Utilize IPC mechanisms for seamless data exchange between system components.
+**Efficient Communication**: Utilize IPC mechanisms for seamless data exchange between system components.
 
-Optimal Resource Utilization: Employ OS resource allocation mechanisms for peak performance.
+**Optimal Resource Utilization**: Employ OS resource allocation mechanisms for peak performance.
 
-Energy Efficiency: Integrate energy management strategies to minimize consumption.
+**Energy Efficiency**: Integrate energy management strategies to minimize consumption.
 
-Functionalities
+**Functionalities**
 
-Temperature Control: Process for monitoring and adjusting thermostat settings.
+_Temperature Control_: Process for monitoring and adjusting thermostat settings.
 
-Lighting Automation: Process for automated light adjustment based on occupancy.
+_Lighting Automation_: Process for automated light adjustment based on occupancy.
 
-Appliance Control: Process for managing appliances remotely.
+_Appliance Control_: Process for managing appliances remotely.
 
-Energy Management: Process for optimizing and monitoring energy usage.
+_Energy Management_: Process for optimizing and monitoring energy usage.
 
 Conclusion
 
 This project aims to deliver a comprehensive smart home system.
+**Simulated sensor data using CSV files in the absence of hardware.**
+
 
