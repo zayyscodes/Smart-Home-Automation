@@ -34,7 +34,11 @@ This project proposes an advanced Smart Home System that utilizes fundamental OS
    git clone <repository-url>
    cd smart-home-system
 
-2. Run the system:
+2. Compile the repository via makefile
+   ```sh
+   make
+
+4. Run the system:
    ```sh
    ./smart_home  # If compiled from C++
 
@@ -43,5 +47,5 @@ This project proposes an advanced Smart Home System that utilizes fundamental OS
 - AI-based predictive energy management.
 - Mobile and web-based control interfaces.
 
-##Conclusion
+## Conclusion
 This project aims to deliver a comprehensive Smart Home System by leveraging OS concepts for seamless automation and efficient resource management.
